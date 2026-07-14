@@ -1,5 +1,6 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="@cloudflare/workers-types" />
+/// <reference types="unplugin-icons/types/solid" />
 
 declare namespace Cloudflare {
 	interface Env {
