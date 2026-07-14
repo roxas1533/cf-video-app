@@ -50,6 +50,21 @@ export async function insertVideo(
 		.run();
 }
 
+export async function renameVideo(
+	db: D1Database,
+	id: string,
+	name: string,
+): Promise<{ ok: true } | { ok: false; reason: "not_found" | "duplicate" }> {
+	const existing = await getVideoByName(db, name);
+	if (existing && existing.id !== id) return { ok: false, reason: "duplicate" };
+	const res = await db
+		.prepare("UPDATE videos SET name = ? WHERE id = ?")
+		.bind(name, id)
+		.run();
+	if (!res.meta.changes) return { ok: false, reason: "not_found" };
+	return { ok: true };
+}
+
 export function formatDuration(seconds: number): string {
 	const m = Math.floor(seconds / 60);
 	const s = Math.floor(seconds % 60);

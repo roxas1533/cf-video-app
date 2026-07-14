@@ -28,13 +28,13 @@ export const POST: APIRoute = async ({ request }) => {
 
 	const bucket = `https://${env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com/my-video`;
 
-	const videoUrl = new URL(`${bucket}/videos/${name}/${name}.mp4`);
+	const videoUrl = new URL(`${bucket}/videos/${id}/video.mp4`);
 	videoUrl.searchParams.set("X-Amz-Expires", "3600");
 	const signedVideo = await r2.sign(new Request(videoUrl, { method: "PUT" }), {
 		aws: { signQuery: true },
 	});
 
-	const thumbUrl = new URL(`${bucket}/videos/${name}/thumbnail.jpg`);
+	const thumbUrl = new URL(`${bucket}/videos/${id}/thumbnail.jpg`);
 	thumbUrl.searchParams.set("X-Amz-Expires", "3600");
 	const signedThumb = await r2.sign(new Request(thumbUrl, { method: "PUT" }), {
 		aws: { signQuery: true },

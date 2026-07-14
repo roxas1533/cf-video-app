@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
 		return Response.json({ error: "Missing id or name" }, { status: 400 });
 	}
 
-	const head = await env.VIDEO_BUCKET.head(`videos/${name}/${name}.mp4`);
+	const head = await env.VIDEO_BUCKET.head(`videos/${id}/video.mp4`);
 	if (!head) {
 		return Response.json(
 			{ error: "Video file not found in R2" },
