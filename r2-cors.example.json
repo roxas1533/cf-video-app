@@ -2,7 +2,7 @@
   "rules": [
     {
       "allowed": {
-        "origins": ["https://my-video.ro15.dev"],
+        "origins": ["https://your-app.example.com"],
         "methods": ["GET", "HEAD", "PUT"],
         "headers": ["Range", "Content-Type"]
       },

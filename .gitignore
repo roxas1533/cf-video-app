@@ -7,3 +7,5 @@ dist-worker/
 .env
 .dev.vars
 /videos/
+wrangler.jsonc
+r2-cors.json

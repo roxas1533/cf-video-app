@@ -11,12 +11,12 @@
 		{
 			"binding": "VIDEO_DB",
 			"database_name": "my-video",
-			"database_id": "a1f4c18e-a98c-420c-8342-14991e4ef6cc"
+			"database_id": "<YOUR_D1_DATABASE_ID>"
 		}
 	],
 	"routes": [
 		{
-			"pattern": "my-video.ro15.dev",
+			"pattern": "your-app.example.com",
 			"custom_domain": true
 		}
 	]
