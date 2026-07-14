@@ -1,0 +1,23 @@
+{
+	"name": "my-video",
+	"compatibility_date": "2025-01-01",
+	"r2_buckets": [
+		{
+			"binding": "VIDEO_BUCKET",
+			"bucket_name": "my-video"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "VIDEO_DB",
+			"database_name": "my-video",
+			"database_id": "a1f4c18e-a98c-420c-8342-14991e4ef6cc"
+		}
+	],
+	"routes": [
+		{
+			"pattern": "my-video.ro15.dev",
+			"custom_domain": true
+		}
+	]
+}

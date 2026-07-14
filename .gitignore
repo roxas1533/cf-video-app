@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-worker/
+.astro/
+.wrangler/
+.direnv/
+.env
+.dev.vars
+/videos/

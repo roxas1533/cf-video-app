@@ -1,0 +1,57 @@
+export type VideoMeta = {
+	name: string;
+	duration: number;
+};
+
+export type Video = { id: string; createdAt: number } & VideoMeta;
+
+export async function getVideoList(db: D1Database): Promise<Video[]> {
+	const { results } = await db
+		.prepare(
+			"SELECT id, name, duration, created_at FROM videos ORDER BY name COLLATE NOCASE ASC",
+		)
+		.all<{ id: string; name: string; duration: number; created_at: number }>();
+	return results.map((r) => ({
+		id: r.id,
+		name: r.name,
+		duration: r.duration,
+		createdAt: r.created_at,
+	}));
+}
+
+export async function getVideoById(
+	db: D1Database,
+	id: string,
+): Promise<VideoMeta | null> {
+	const row = await db
+		.prepare("SELECT name, duration FROM videos WHERE id = ?")
+		.bind(id)
+		.first<{ name: string; duration: number }>();
+	return row ?? null;
+}
+
+export async function getVideoByName(
+	db: D1Database,
+	name: string,
+): Promise<{ id: string } | null> {
+	return db
+		.prepare("SELECT id FROM videos WHERE name = ?")
+		.bind(name)
+		.first<{ id: string }>();
+}
+
+export async function insertVideo(
+	db: D1Database,
+	video: { id: string; name: string; duration: number },
+): Promise<void> {
+	await db
+		.prepare("INSERT INTO videos (id, name, duration) VALUES (?, ?, ?)")
+		.bind(video.id, video.name, video.duration)
+		.run();
+}
+
+export function formatDuration(seconds: number): string {
+	const m = Math.floor(seconds / 60);
+	const s = Math.floor(seconds % 60);
+	return `${m}:${s.toString().padStart(2, "0")}`;
+}

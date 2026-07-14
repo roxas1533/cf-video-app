@@ -1,0 +1,29 @@
+---
+import { env } from "cloudflare:workers";
+import VideoPlayer from "../../components/VideoPlayer.tsx";
+import Layout from "../../layouts/Layout.astro";
+import { getVideoById } from "../../lib/videos";
+
+const id = Astro.params.id;
+if (!id) return Astro.redirect("/");
+
+const t0 = Date.now();
+const video = await getVideoById(env.VIDEO_DB, id);
+const dbTime = Date.now() - t0;
+if (!video) return Astro.redirect("/");
+
+Astro.response.headers.set("Server-Timing", `db;dur=${dbTime}`);
+---
+<Layout title={video.name}>
+	<div class="container">
+		<div class="header">
+			<a href="/" class="back-btn">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M15 18l-6-6 6-6" />
+				</svg>
+			</a>
+			<h1>{video.name}</h1>
+		</div>
+		<VideoPlayer client:only="solid-js" videoId={id} videoName={video.name} />
+	</div>
+</Layout>

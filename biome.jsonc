@@ -1,0 +1,21 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+	"files": {
+		"includes": [
+			"src/**/*.ts",
+			"src/**/*.tsx",
+			"src/**/*.css",
+			"*.ts",
+			"*.jsonc",
+			"*.mjs"
+		]
+	},
+	"formatter": {
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"rules": {
+			"recommended": true
+		}
+	}
+}

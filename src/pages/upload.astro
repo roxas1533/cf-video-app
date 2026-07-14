@@ -1,0 +1,17 @@
+---
+import UploadForm from "../components/UploadForm.tsx";
+import Layout from "../layouts/Layout.astro";
+---
+<Layout title="アップロード">
+	<div class="container">
+		<div class="header">
+			<a href="/" class="back-btn">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M15 18l-6-6 6-6" />
+				</svg>
+			</a>
+			<h1>アップロード</h1>
+		</div>
+		<UploadForm client:only="solid-js" />
+	</div>
+</Layout>
