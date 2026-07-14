@@ -19,8 +19,8 @@
 }
 
 html {
-	background: var(--bg);
-	min-height: 100%;
+	background-color: var(--bg);
+	min-height: 100dvh;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,9 +38,10 @@ html {
 
 body {
 	font-family: system-ui, -apple-system, sans-serif;
-	background: var(--bg);
+	background-color: var(--bg);
 	color: var(--text);
 	line-height: 1.5;
+	min-height: 100dvh;
 	-webkit-font-smoothing: antialiased;
 }
 
@@ -239,8 +240,8 @@ a {
 	border: none;
 	border-radius: 12px;
 	padding: 1.25rem;
-	width: calc(100% - 2rem);
-	max-width: 420px;
+	width: min(420px, calc(100% - 2rem));
+	margin: auto;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
