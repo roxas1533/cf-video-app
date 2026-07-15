@@ -5,7 +5,6 @@ import {
 	For,
 	Show,
 } from "solid-js";
-import IconMoreVertical from "~icons/feather/more-vertical";
 import { apiFetch } from "../lib/fetch";
 import type { Video } from "../lib/videos";
 
@@ -20,12 +19,12 @@ function Skeleton() {
 		<div class="video-grid">
 			<For each={[0, 1, 2]}>
 				{() => (
-					<div class="video-card">
-						<div class="video-card-thumb">
-							<div class="skeleton skeleton-thumb" />
+					<div class="video-card group">
+						<div class="relative">
+							<div class="skeleton w-full aspect-video" />
 						</div>
-						<div class="video-card-title">
-							<div class="skeleton skeleton-text" />
+						<div class="px-2 py-1.5">
+							<div class="skeleton h-4 w-3/5" />
 						</div>
 					</div>
 				)}
@@ -46,7 +45,13 @@ export default function VideoGrid() {
 	const [renameError, setRenameError] = createSignal("");
 	const [renameSaving, setRenameSaving] = createSignal(false);
 
+	const [deleteTarget, setDeleteTarget] = createSignal<Video | null>(null);
+	const [deleteConfirm, setDeleteConfirm] = createSignal("");
+	const [deleteError, setDeleteError] = createSignal("");
+	const [deleteSaving, setDeleteSaving] = createSignal(false);
+
 	let dialogRef: HTMLDialogElement | undefined;
+	let deleteDialogRef: HTMLDialogElement | undefined;
 
 	const openRename = (e: MouseEvent, video: Video) => {
 		const popover = (e.currentTarget as HTMLElement).closest("[popover]");
@@ -61,9 +66,28 @@ export default function VideoGrid() {
 		setRenameError("");
 	};
 
+	const openDelete = (e: MouseEvent, video: Video) => {
+		const popover = (e.currentTarget as HTMLElement).closest("[popover]");
+		(popover as HTMLElement | null)?.hidePopover();
+		setDeleteTarget(video);
+		setDeleteConfirm("");
+		setDeleteError("");
+	};
+
+	const closeDelete = () => {
+		setDeleteTarget(null);
+		setDeleteError("");
+		setDeleteConfirm("");
+	};
+
 	createEffect(() => {
 		if (renameTarget()) dialogRef?.showModal();
 		else dialogRef?.close();
+	});
+
+	createEffect(() => {
+		if (deleteTarget()) deleteDialogRef?.showModal();
+		else deleteDialogRef?.close();
 	});
 
 	const submitRename = async () => {
@@ -97,6 +121,33 @@ export default function VideoGrid() {
 		}
 	};
 
+	const deleteConfirmed = () => {
+		const target = deleteTarget();
+		return !!target && deleteConfirm() === target.name;
+	};
+
+	const submitDelete = async () => {
+		const target = deleteTarget();
+		if (!target || !deleteConfirmed()) return;
+		setDeleteSaving(true);
+		try {
+			const res = await apiFetch(`/api/videos/${target.id}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) {
+				const data = (await res.json().catch(() => ({}))) as {
+					error?: string;
+				};
+				setDeleteError(data.error ?? `削除に失敗しました (${res.status})`);
+				return;
+			}
+			closeDelete();
+			refetch();
+		} finally {
+			setDeleteSaving(false);
+		}
+	};
+
 	return (
 		<>
 			<Show when={videos()} fallback={<Skeleton />}>
@@ -107,9 +158,10 @@ export default function VideoGrid() {
 								const popoverId = `menu-${video.id}`;
 								const anchor = `--${popoverId}`;
 								return (
-									<div class="video-card">
-										<div class="video-card-thumb">
+									<div class="video-card group">
+										<div class="relative">
 											<img
+												class="video-card-thumb-img"
 												src={`/api/videos/${video.id}/thumbnail`}
 												alt={video.name}
 												loading="lazy"
@@ -121,7 +173,7 @@ export default function VideoGrid() {
 												popovertarget={popoverId}
 												style={{ "anchor-name": anchor }}
 											>
-												<IconMoreVertical />
+												<span class="i-feather-more-vertical text-base" />
 											</button>
 											<div
 												id={popoverId}
@@ -133,14 +185,23 @@ export default function VideoGrid() {
 												<button
 													type="button"
 													role="menuitem"
+													class="video-card-menu-item"
 													onClick={(e) => openRename(e, video)}
 												>
 													名前を変更
 												</button>
+												<button
+													type="button"
+													role="menuitem"
+													class="video-card-menu-item-danger"
+													onClick={(e) => openDelete(e, video)}
+												>
+													削除
+												</button>
 											</div>
 											<Show when={video.duration}>
 												{(d) => (
-													<span class="video-card-duration">
+													<span class="badge-overlay">
 														{formatDuration(d())}
 													</span>
 												)}
@@ -148,7 +209,7 @@ export default function VideoGrid() {
 										</div>
 										<a
 											href={`/watch/${video.id}`}
-											class="video-card-title video-card-link"
+											class="video-card-link-overlay"
 										>
 											{video.name}
 										</a>
@@ -172,7 +233,6 @@ export default function VideoGrid() {
 				<Show when={renameTarget()}>
 					{(target) => (
 						<form
-							class="modal-content"
 							onSubmit={(e) => {
 								e.preventDefault();
 								submitRename();
@@ -194,7 +254,7 @@ export default function VideoGrid() {
 							<div class="modal-actions">
 								<button
 									type="button"
-									class="modal-btn modal-btn-secondary"
+									class="modal-btn-secondary"
 									onClick={closeRename}
 									disabled={renameSaving()}
 								>
@@ -202,10 +262,68 @@ export default function VideoGrid() {
 								</button>
 								<button
 									type="submit"
-									class="modal-btn modal-btn-primary"
+									class="modal-btn-primary"
 									disabled={renameSaving()}
 								>
 									{renameSaving() ? "保存中..." : "保存"}
+								</button>
+							</div>
+						</form>
+					)}
+				</Show>
+			</dialog>
+
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: dialog handles Escape natively */}
+			<dialog
+				ref={deleteDialogRef}
+				class="modal"
+				onClose={closeDelete}
+				onClick={(e) => {
+					if (e.target === deleteDialogRef) closeDelete();
+				}}
+			>
+				<Show when={deleteTarget()}>
+					{(target) => (
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								submitDelete();
+							}}
+						>
+							<h2 class="modal-title">動画を削除</h2>
+							<p class="modal-warn">
+								この操作は取り消せません。動画ファイルとメタデータが完全に削除されます。
+							</p>
+							<p class="modal-hint">
+								削除するには <strong>{target().name}</strong> と入力してください
+							</p>
+							<input
+								class="modal-input"
+								type="text"
+								value={deleteConfirm()}
+								onInput={(e) => setDeleteConfirm(e.currentTarget.value)}
+								maxLength={200}
+								autocomplete="off"
+								autofocus
+							/>
+							<Show when={deleteError()}>
+								{(msg) => <p class="modal-error">{msg()}</p>}
+							</Show>
+							<div class="modal-actions">
+								<button
+									type="button"
+									class="modal-btn-secondary"
+									onClick={closeDelete}
+									disabled={deleteSaving()}
+								>
+									キャンセル
+								</button>
+								<button
+									type="submit"
+									class="modal-btn-danger"
+									disabled={!deleteConfirmed() || deleteSaving()}
+								>
+									{deleteSaving() ? "削除中..." : "削除"}
 								</button>
 							</div>
 						</form>

@@ -15,7 +15,10 @@
 		"@cloudflare/workers-types": "^4.20260317.1",
 		"@iconify-json/feather": "^1.2.1",
 		"@types/bun": "latest",
-		"unplugin-icons": "^23.0.1",
+		"@unocss/astro": "^66.7.5",
+		"@unocss/preset-icons": "^66.7.5",
+		"@unocss/preset-uno": "^66.7.5",
+		"unocss": "^66.7.5",
 		"wrangler": "^4.77.0"
 	},
 	"peerDependencies": {

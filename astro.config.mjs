@@ -1,16 +1,15 @@
 import cloudflare from "@astrojs/cloudflare";
 import solidJs from "@astrojs/solid-js";
 import { defineConfig } from "astro/config";
-import Icons from "unplugin-icons/vite";
+import UnoCSS from "unocss/astro";
 
 export default defineConfig({
-	integrations: [solidJs()],
+	integrations: [solidJs(), UnoCSS({ injectReset: false })],
 	adapter: cloudflare({
 		platformProxy: { enabled: true },
 	}),
 	output: "server",
 	vite: {
-		plugins: [Icons({ compiler: "solid" })],
 		ssr: {
 			external: ["cookie"],
 		},

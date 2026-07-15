@@ -1,17 +1,14 @@
 ---
-import svgUpload from "~icons/feather/upload?raw";
 import VideoGrid from "../components/VideoGrid.tsx";
 import Layout from "../layouts/Layout.astro";
 ---
 <Layout>
 	<div class="container">
 		<div class="header">
-			<h1>Videos</h1>
-			<div class="header-actions">
-				<a href="/upload" class="header-link" title="Upload">
-					<Fragment set:html={svgUpload} />
-				</a>
-			</div>
+			<h1 class="text-2xl font-semibold">Videos</h1>
+			<a href="/upload" class="btn-icon-circle ml-auto" title="Upload">
+				<span class="i-feather-upload text-lg" />
+			</a>
 		</div>
 		<VideoGrid client:only="solid-js" />
 	</div>

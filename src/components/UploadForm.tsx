@@ -232,13 +232,13 @@ export default function UploadForm() {
 				<Show
 					when={file()}
 					fallback={
-						<p class="upload-dropzone-text">
+						<p class="text-text-secondary text-[0.95rem]">
 							クリックまたはドラッグで動画ファイルを選択
 						</p>
 					}
 				>
 					{(f) => (
-						<p class="upload-dropzone-text">
+						<p class="text-text-secondary text-[0.95rem]">
 							{f().name} ({formatSize(f().size)})
 						</p>
 					)}
@@ -246,25 +246,25 @@ export default function UploadForm() {
 			</button>
 
 			<Show when={processing()}>
-				<p class="upload-processing">動画を処理中...</p>
+				<p class="text-text-secondary text-sm">動画を処理中...</p>
 			</Show>
 
 			<Show when={thumbnailUrl()}>
 				{(url) => (
-					<div class="upload-preview">
-						<img src={url()} alt="サムネイルプレビュー" />
+					<div class="relative rounded-xl overflow-hidden bg-black">
+						<img
+							class="w-full block aspect-video object-cover"
+							src={url()}
+							alt="サムネイルプレビュー"
+						/>
 						<Show when={duration()}>
-							{(d) => (
-								<span class="upload-preview-duration">
-									{formatDuration(d())}
-								</span>
-							)}
+							{(d) => <span class="badge-overlay">{formatDuration(d())}</span>}
 						</Show>
 					</div>
 				)}
 			</Show>
 
-			<label class="upload-label">
+			<label class="flex flex-col gap-1.5 text-sm font-medium text-text-secondary">
 				動画名
 				<input
 					class="upload-input"
@@ -276,16 +276,20 @@ export default function UploadForm() {
 				/>
 			</label>
 
-			<Show when={error()}>{(msg) => <p class="upload-error">{msg()}</p>}</Show>
+			<Show when={error()}>
+				{(msg) => <p class="text-danger text-sm">{msg()}</p>}
+			</Show>
 
 			<Show when={step() === "uploading"}>
-				<div class="upload-progress">
+				<div class="h-1.5 rounded bg-surface overflow-hidden">
 					<div
-						class="upload-progress-bar"
+						class="h-full bg-accent transition-[width] duration-200"
 						style={{ width: `${progress()}%` }}
 					/>
 				</div>
-				<p class="upload-progress-text">{Math.round(progress())}%</p>
+				<p class="text-sm text-text-secondary text-center">
+					{Math.round(progress())}%
+				</p>
 			</Show>
 
 			<button
@@ -298,7 +302,11 @@ export default function UploadForm() {
 			</button>
 
 			<Show when={storageSize()}>
-				{(size) => <p class="upload-storage">使用容量: {formatSize(size())}</p>}
+				{(size) => (
+					<p class="text-sm text-text-secondary text-center">
+						使用容量: {formatSize(size())}
+					</p>
+				)}
 			</Show>
 		</div>
 	);

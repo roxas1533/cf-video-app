@@ -146,7 +146,7 @@ export default function VideoPlayer(props: Props) {
 	return (
 		<video
 			ref={videoEl}
-			class="player-video"
+			class="w-full aspect-video"
 			playsinline
 			preload="none"
 			poster={thumbnailUrl()}
