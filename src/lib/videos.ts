@@ -65,6 +65,17 @@ export async function renameVideo(
 	return { ok: true };
 }
 
+export async function deleteVideo(
+	db: D1Database,
+	id: string,
+): Promise<boolean> {
+	const res = await db
+		.prepare("DELETE FROM videos WHERE id = ?")
+		.bind(id)
+		.run();
+	return res.meta.changes > 0;
+}
+
 export function formatDuration(seconds: number): string {
 	const m = Math.floor(seconds / 60);
 	const s = Math.floor(seconds % 60);

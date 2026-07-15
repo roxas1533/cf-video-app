@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
-import { renameVideo } from "../../../../lib/videos";
+import { deleteVideo, renameVideo } from "../../../../lib/videos";
 
 export const PATCH: APIRoute = async ({ params, request }) => {
 	const id = params.id ?? "";
@@ -22,4 +22,19 @@ export const PATCH: APIRoute = async ({ params, request }) => {
 	}
 
 	return Response.json({ id, name });
+};
+
+export const DELETE: APIRoute = async ({ params }) => {
+	const id = params.id ?? "";
+	if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
+
+	await env.VIDEO_BUCKET.delete([
+		`videos/${id}/video.mp4`,
+		`videos/${id}/thumbnail.jpg`,
+	]);
+
+	const removed = await deleteVideo(env.VIDEO_DB, id);
+	if (!removed) return Response.json({ error: "Not found" }, { status: 404 });
+
+	return Response.json({ id });
 };
