@@ -6,6 +6,7 @@ import { apiFetch } from "../lib/fetch";
 interface Props {
 	videoId: string;
 	videoName: string;
+	streamUrl: string;
 }
 
 async function fetchStreamUrl(id: string): Promise<string> {
@@ -16,10 +17,8 @@ async function fetchStreamUrl(id: string): Promise<string> {
 
 export default function VideoPlayer(props: Props) {
 	const thumbnailUrl = () => `/api/videos/${props.videoId}/thumbnail`;
-	const [streamUrl, setStreamUrl] = createSignal<string>();
+	const [streamUrl, setStreamUrl] = createSignal<string>(props.streamUrl);
 	let refreshing = false;
-
-	fetchStreamUrl(props.videoId).then(setStreamUrl);
 
 	let videoEl!: HTMLVideoElement;
 	let player: Plyr | undefined;

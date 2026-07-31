@@ -18,7 +18,9 @@ const { title = "my-video" } = Astro.props;
 	<slot />
 	<script>
 		import { startSessionMonitor } from "../lib/sessionMonitor";
+		import { startPerfLogger } from "../lib/perfLogger";
 		startSessionMonitor();
+		startPerfLogger();
 	</script>
 </body>
 </html>

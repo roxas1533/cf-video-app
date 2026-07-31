@@ -7,3 +7,4 @@ dist-worker/
 .env
 .dev.vars
 /videos/
+/scripts/perf/

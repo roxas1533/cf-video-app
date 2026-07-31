@@ -2,6 +2,7 @@ import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async () => {
+	const t0 = Date.now();
 	let totalSize = 0;
 	let cursor: string | undefined;
 
@@ -12,6 +13,10 @@ export const GET: APIRoute = async () => {
 		}
 		cursor = list.truncated ? list.cursor : undefined;
 	} while (cursor);
+	const r2Time = Date.now() - t0;
 
-	return Response.json({ totalSize });
+	return Response.json(
+		{ totalSize },
+		{ headers: { "Server-Timing": `r2;dur=${r2Time}` } },
+	);
 };
