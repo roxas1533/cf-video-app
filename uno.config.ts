@@ -35,8 +35,7 @@ const shortcuts = {
 	"modal-btn":
 		"px-4 py-2 border-none rounded-lg text-sm font-medium cursor-pointer transition-opacity disabled:opacity-50 disabled:cursor-not-allowed hover:not-disabled:opacity-90",
 	"modal-btn-primary": "modal-btn bg-accent text-white",
-	"modal-btn-secondary":
-		"modal-btn bg-surface text-text border border-border",
+	"modal-btn-secondary": "modal-btn bg-surface text-text border border-border",
 	"modal-btn-danger": "modal-btn bg-danger text-white",
 	skeleton:
 		"bg-surface rounded-lg animate-[skeleton-pulse_1.2s_ease-in-out_infinite]",
