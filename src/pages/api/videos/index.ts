@@ -8,13 +8,17 @@ export const GET: APIRoute = async ({ locals }) => {
 
   const cached = await cache.match(VIDEO_LIST_CACHE_KEY);
   if (cached) {
-    const res = new Response(cached.body, cached);
-    const existing = res.headers.get("Server-Timing") ?? "";
-    res.headers.set(
+    const headers = new Headers(cached.headers);
+    const existing = headers.get("Server-Timing") ?? "";
+    headers.set(
       "Server-Timing",
       existing ? `${existing}, src;desc=cache` : "src;desc=cache",
     );
-    return res;
+    return new Response(cached.body, {
+      status: cached.status,
+      statusText: cached.statusText,
+      headers,
+    });
   }
 
   const t0 = Date.now();
@@ -30,7 +34,7 @@ export const GET: APIRoute = async ({ locals }) => {
     },
   });
 
-  locals.runtime.ctx.waitUntil(
+  locals.cfContext.waitUntil(
     cache.put(VIDEO_LIST_CACHE_KEY, response.clone()),
   );
   return response;

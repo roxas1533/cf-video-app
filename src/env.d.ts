@@ -17,12 +17,3 @@ interface CacheStorage {
   readonly default: Cache;
 }
 
-// Astro Cloudflare adapter attaches runtime info to locals.
-declare namespace App {
-  interface Locals {
-    runtime: {
-      env: Cloudflare.Env;
-      ctx: ExecutionContext;
-    };
-  }
-}
