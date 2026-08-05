@@ -16,4 +16,3 @@ declare namespace Cloudflare {
 interface CacheStorage {
   readonly default: Cache;
 }
-

@@ -34,8 +34,6 @@ export const GET: APIRoute = async ({ locals }) => {
     },
   });
 
-  locals.cfContext.waitUntil(
-    cache.put(VIDEO_LIST_CACHE_KEY, response.clone()),
-  );
+  locals.cfContext.waitUntil(cache.put(VIDEO_LIST_CACHE_KEY, response.clone()));
   return response;
 };
