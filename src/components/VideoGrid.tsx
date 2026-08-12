@@ -1,5 +1,6 @@
 import {
   createEffect,
+  createMemo,
   createResource,
   createSignal,
   For,
@@ -46,6 +47,16 @@ export default function VideoGrid() {
     const data = (await res.json()) as { videos: Video[] };
     return data.videos;
   });
+
+  const [query, setQuery] = createSignal("");
+  const [searchFocused, setSearchFocused] = createSignal(false);
+  const filteredVideos = createMemo(() => {
+    const q = query().trim().toLowerCase();
+    const list = videos() ?? [];
+    if (!q) return list;
+    return list.filter((v) => v.name.toLowerCase().includes(q));
+  });
+  let searchInputRef: HTMLInputElement | undefined;
 
   const [renameTarget, setRenameTarget] = createSignal<Video | null>(null);
   const [renameInput, setRenameInput] = createSignal("");
@@ -158,78 +169,113 @@ export default function VideoGrid() {
   return (
     <>
       <Show when={videos()} fallback={<Skeleton />}>
-        {(list) => (
-          <div class="video-grid">
-            <For each={list()}>
-              {(video) => {
-                const popoverId = `menu-${video.id}`;
-                const anchor = `--${popoverId}`;
-                return (
-                  <div class="video-card group">
-                    <div class="relative">
-                      <img
-                        class="video-card-thumb-img"
-                        src={`/api/videos/${video.id}/thumbnail`}
-                        alt={video.name}
-                        loading="lazy"
-                      />
+        <div class="video-grid">
+          <For each={filteredVideos()}>
+            {(video) => {
+              const popoverId = `menu-${video.id}`;
+              const anchor = `--${popoverId}`;
+              return (
+                <div class="video-card group">
+                  <div class="relative">
+                    <img
+                      class="video-card-thumb-img"
+                      src={`/api/videos/${video.id}/thumbnail`}
+                      alt={video.name}
+                      loading="lazy"
+                    />
+                    <button
+                      type="button"
+                      class="video-card-menu-btn"
+                      aria-label="メニュー"
+                      popovertarget={popoverId}
+                      style={{ "anchor-name": anchor }}
+                    >
+                      <span class="i-feather-more-vertical text-base" />
+                    </button>
+                    <div
+                      id={popoverId}
+                      class="video-card-menu"
+                      popover="auto"
+                      role="menu"
+                      style={{ "position-anchor": anchor }}
+                    >
                       <button
                         type="button"
-                        class="video-card-menu-btn"
-                        aria-label="メニュー"
-                        popovertarget={popoverId}
-                        style={{ "anchor-name": anchor }}
+                        role="menuitem"
+                        class="video-card-menu-item"
+                        onClick={(e) => openRename(e, video)}
                       >
-                        <span class="i-feather-more-vertical text-base" />
+                        名前を変更
                       </button>
-                      <div
-                        id={popoverId}
-                        class="video-card-menu"
-                        popover="auto"
-                        role="menu"
-                        style={{ "position-anchor": anchor }}
+                      <button
+                        type="button"
+                        role="menuitem"
+                        class="video-card-menu-item-danger"
+                        onClick={(e) => openDelete(e, video)}
                       >
-                        <button
-                          type="button"
-                          role="menuitem"
-                          class="video-card-menu-item"
-                          onClick={(e) => openRename(e, video)}
-                        >
-                          名前を変更
-                        </button>
-                        <button
-                          type="button"
-                          role="menuitem"
-                          class="video-card-menu-item-danger"
-                          onClick={(e) => openDelete(e, video)}
-                        >
-                          削除
-                        </button>
-                      </div>
-                      <Show when={video.duration}>
-                        {(d) => (
-                          <span class="badge-overlay">
-                            {formatDuration(d())}
-                          </span>
-                        )}
-                      </Show>
+                        削除
+                      </button>
                     </div>
-                    <a
-                      href={`/watch/${video.id}`}
-                      class="video-card-link-overlay"
-                    >
-                      <span class="video-card-name">{video.name}</span>
-                      <span class="video-card-size">
-                        {formatSize(video.size)}
-                      </span>
-                    </a>
+                    <Show when={video.duration}>
+                      {(d) => (
+                        <span class="badge-overlay">{formatDuration(d())}</span>
+                      )}
+                    </Show>
                   </div>
-                );
-              }}
-            </For>
-          </div>
-        )}
+                  <a
+                    href={`/watch/${video.id}`}
+                    class="video-card-link-overlay"
+                  >
+                    <span class="video-card-name">{video.name}</span>
+                    <span class="video-card-size">
+                      {formatSize(video.size)}
+                    </span>
+                  </a>
+                </div>
+              );
+            }}
+          </For>
+        </div>
       </Show>
+      <div class="search-spacer" />
+
+      <label class="search-fab-shell">
+        <Show when={searchFocused() && query()}>
+          <div class="search-suggest-panel">
+            <Show
+              when={filteredVideos().length > 0}
+              fallback={<span class="search-suggest-empty">No matches</span>}
+            >
+              <For each={filteredVideos().slice(0, 8)}>
+                {(v) => <span class="search-suggest-item">{v.name}</span>}
+              </For>
+            </Show>
+          </div>
+        </Show>
+        <span class="search-fab-icon" aria-hidden="true">
+          <span class="i-feather-search" />
+          <Show when={!searchFocused() && query()}>
+            <span class="search-fab-badge" />
+          </Show>
+        </span>
+        <input
+          ref={searchInputRef}
+          class="search-fab-input"
+          type="search"
+          placeholder="Search videos..."
+          value={query()}
+          onInput={(e) => setQuery(e.currentTarget.value)}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.preventDefault();
+              searchInputRef?.blur();
+            }
+          }}
+          aria-label="Search videos"
+        />
+      </label>
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: dialog handles Escape natively */}
       <dialog

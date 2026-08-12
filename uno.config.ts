@@ -48,6 +48,19 @@ const shortcuts = {
     "appearance-none px-3 py-2 border border-border rounded-lg bg-surface text-text text-[0.95rem] outline-none transition-colors focus:border-accent",
   "upload-btn":
     "px-6 py-2.5 border-none rounded-lg bg-accent text-white text-[0.95rem] font-medium cursor-pointer transition-opacity hover:not-disabled:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed",
+  "search-fab-shell":
+    "group fixed z-10 right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] flex items-center h-14 w-14 rounded-full overflow-clip bg-bg/70 backdrop-blur-md text-text border border-border shadow-[0_4px_12px_rgba(0,0,0,0.15)] cursor-pointer transition-[width,border-color] duration-800 ease-[var(--spring)] focus-within:w-[min(calc(100vw-2rem),28rem)] focus-within:border-accent focus-within:cursor-text",
+  "search-fab-icon":
+    "relative flex-shrink-0 w-14 h-14 inline-flex items-center justify-center pointer-events-none text-xl text-text-secondary transition-colors group-focus-within:text-accent",
+  "search-fab-input":
+    "flex-1 min-w-0 max-w-0 py-0 px-0 bg-transparent border-none text-text placeholder:text-text-secondary outline-none text-[0.95rem] opacity-0 pointer-events-none transition-[max-width,opacity,padding-right] duration-700 ease-[var(--spring)] focus:max-w-full focus:opacity-100 focus:pointer-events-auto focus:pr-4",
+  "search-fab-badge":
+    "absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-accent border-2 border-bg pointer-events-none",
+  "search-suggest-panel":
+    "absolute bottom-full left-0 right-0 mb-2 bg-bg border border-border rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)] p-2 pointer-events-none max-h-60 overflow-hidden text-sm text-text",
+  "search-suggest-item": "block px-2 py-1 truncate",
+  "search-suggest-empty": "block px-2 py-1 text-text-secondary italic",
+  "search-spacer": "h-20",
 };
 
 export default defineConfig({
