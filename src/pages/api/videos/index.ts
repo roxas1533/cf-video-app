@@ -1,12 +1,13 @@
 import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 import { getVideoList } from "../../../lib/videos";
-import { VIDEO_LIST_CACHE_KEY } from "../../../lib/videosCache";
+import {
+  matchVideoListCache,
+  putVideoListCache,
+} from "../../../lib/videosCache";
 
-export const GET: APIRoute = async ({ locals }) => {
-  const cache = caches.default;
-
-  const cached = await cache.match(VIDEO_LIST_CACHE_KEY);
+export const GET: APIRoute = async ({ locals, request }) => {
+  const cached = await matchVideoListCache(request);
   if (cached) {
     const headers = new Headers(cached.headers);
     const existing = headers.get("Server-Timing") ?? "";
@@ -29,11 +30,11 @@ export const GET: APIRoute = async ({ locals }) => {
   const response = new Response(body, {
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, s-maxage=3600, no-cache",
       "Server-Timing": `db;dur=${dbTime}, src;desc=d1`,
     },
   });
 
-  locals.cfContext.waitUntil(cache.put(VIDEO_LIST_CACHE_KEY, response.clone()));
+  locals.cfContext.waitUntil(putVideoListCache(request, response.clone()));
   return response;
 };

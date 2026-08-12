@@ -21,12 +21,12 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     }
     return Response.json({ error: "Name already exists" }, { status: 409 });
   }
-  await invalidateVideoListCache();
+  await invalidateVideoListCache(request);
 
   return Response.json({ id, name });
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async ({ params, request }) => {
   const id = params.id ?? "";
   if (!id) return Response.json({ error: "Missing id" }, { status: 400 });
 
@@ -37,7 +37,7 @@ export const DELETE: APIRoute = async ({ params }) => {
 
   const removed = await deleteVideo(env.VIDEO_DB, id);
   if (!removed) return Response.json({ error: "Not found" }, { status: 404 });
-  await invalidateVideoListCache();
+  await invalidateVideoListCache(request);
 
   return Response.json({ id });
 };

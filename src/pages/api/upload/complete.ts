@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   await insertVideo(env.VIDEO_DB, { id, name, duration, size: head.size });
-  await invalidateVideoListCache();
+  await invalidateVideoListCache(request);
 
   return Response.json({ id });
 };
