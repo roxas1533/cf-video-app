@@ -275,6 +275,20 @@ export default function VideoGrid() {
           }}
           aria-label="Search videos"
         />
+        <Show when={searchFocused() && query()}>
+          <button
+            type="button"
+            class="search-fab-clear"
+            aria-label="Clear search"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              setQuery("");
+              searchInputRef?.focus();
+            }}
+          >
+            <span class="i-feather-x" />
+          </button>
+        </Show>
       </label>
 
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: dialog handles Escape natively */}
