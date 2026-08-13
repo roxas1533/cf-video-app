@@ -48,7 +48,9 @@ export default function VideoGrid() {
     return data.videos;
   });
 
-  const [query, setQuery] = createSignal("");
+  const initialQuery =
+    new URLSearchParams(window.location.search).get("q") ?? "";
+  const [query, setQuery] = createSignal(initialQuery);
   const [searchFocused, setSearchFocused] = createSignal(false);
   const filteredVideos = createMemo(() => {
     const q = query().trim().toLowerCase();
@@ -57,6 +59,18 @@ export default function VideoGrid() {
     return list.filter((v) => v.name.toLowerCase().includes(q));
   });
   let searchInputRef: HTMLInputElement | undefined;
+
+  createEffect(() => {
+    const q = query();
+    const url = new URL(window.location.href);
+    if (q) url.searchParams.set("q", q);
+    else url.searchParams.delete("q");
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (next !== current) {
+      history.replaceState(history.state, "", next);
+    }
+  });
 
   const [renameTarget, setRenameTarget] = createSignal<Video | null>(null);
   const [renameInput, setRenameInput] = createSignal("");

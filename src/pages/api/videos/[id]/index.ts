@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
+import { invalidateThumbnailCache } from "../../../../lib/thumbnailCache";
 import { deleteVideo, renameVideo } from "../../../../lib/videos";
 import { invalidateVideoListCache } from "../../../../lib/videosCache";
 
@@ -38,6 +39,7 @@ export const DELETE: APIRoute = async ({ params, request }) => {
   const removed = await deleteVideo(env.VIDEO_DB, id);
   if (!removed) return Response.json({ error: "Not found" }, { status: 404 });
   await invalidateVideoListCache(request);
+  await invalidateThumbnailCache(request, id);
 
   return Response.json({ id });
 };
