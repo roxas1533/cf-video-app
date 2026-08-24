@@ -10,6 +10,7 @@ export default defineConfig({
     UnoCSS(),
   ],
   build: {
+    outDir: ".output/public",
     minify: false,
     rollupOptions: {
       external: [/^cloudflare:/],
