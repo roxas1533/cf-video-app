@@ -1,8 +1,11 @@
 import { Title } from "@solidjs/meta";
 import { A } from "@solidjs/router";
-import { clientOnly } from "@solidjs/start";
+import VideoGrid from "~/components/VideoGrid";
+import { videosQuery } from "~/lib/videosQuery";
 
-const VideoGrid = clientOnly(() => import("~/components/VideoGrid"));
+export const route = {
+  preload: () => videosQuery(),
+};
 
 export default function Home() {
   return (

@@ -1,13 +1,8 @@
-import { A, createAsync, query, revalidate } from "@solidjs/router";
+import { A, createAsync, revalidate, useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { apiFetch } from "../lib/fetch";
+import { videosQuery } from "../lib/videosQuery";
 import type { Video } from "../lib/videos";
-
-const videosQuery = query(async () => {
-  const res = await apiFetch("/api/videos");
-  const data = (await res.json()) as { videos: Video[] };
-  return data.videos;
-}, "videos");
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -45,9 +40,12 @@ export default function VideoGrid() {
   const videos = createAsync(() => videosQuery());
   const refetch = () => revalidate(videosQuery.keyFor());
 
-  const initialQuery =
-    new URLSearchParams(window.location.search).get("q") ?? "";
-  const [query, setQuery] = createSignal(initialQuery);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = createSignal<string>(
+    Array.isArray(searchParams.q)
+      ? (searchParams.q[0] ?? "")
+      : (searchParams.q ?? ""),
+  );
   const [searchFocused, setSearchFocused] = createSignal(false);
   const filteredVideos = createMemo(() => {
     const q = query().trim().toLowerCase();
@@ -59,14 +57,7 @@ export default function VideoGrid() {
 
   createEffect(() => {
     const q = query();
-    const url = new URL(window.location.href);
-    if (q) url.searchParams.set("q", q);
-    else url.searchParams.delete("q");
-    const next = `${url.pathname}${url.search}${url.hash}`;
-    const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-    if (next !== current) {
-      history.replaceState(history.state, "", next);
-    }
+    setSearchParams({ q: q || undefined }, { replace: true });
   });
 
   const [renameTarget, setRenameTarget] = createSignal<Video | null>(null);
@@ -182,7 +173,7 @@ export default function VideoGrid() {
       <Show when={videos()} fallback={<Skeleton />}>
         <div class="video-grid">
           <For each={filteredVideos()}>
-            {(video) => {
+            {(video, index) => {
               const popoverId = `menu-${video.id}`;
               const anchor = `--${popoverId}`;
               return (
@@ -192,7 +183,8 @@ export default function VideoGrid() {
                       class="video-card-thumb-img"
                       src={`/api/videos/${video.id}/thumbnail`}
                       alt={video.name}
-                      loading="lazy"
+                      loading={index() === 0 ? "eager" : "lazy"}
+                      fetchpriority={index() === 0 ? "high" : "auto"}
                     />
                     <button
                       type="button"
