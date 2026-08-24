@@ -1,11 +1,5 @@
 import { A, createAsync, query, revalidate } from "@solidjs/router";
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  For,
-  Show,
-} from "solid-js";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { apiFetch } from "../lib/fetch";
 import type { Video } from "../lib/videos";
 
