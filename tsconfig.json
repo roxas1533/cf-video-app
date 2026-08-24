@@ -1,6 +1,19 @@
 {
-	"extends": "astro/tsconfigs/strict",
 	"compilerOptions": {
-		"jsxImportSource": "solid-js"
+		"strict": true,
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"verbatimModuleSyntax": true,
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
+		"types": ["./worker-configuration.d.ts"],
+		"paths": {
+			"~/*": ["./src/*"]
+		}
 	}
 }

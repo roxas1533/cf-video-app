@@ -66,6 +66,9 @@ const shortcuts = {
 };
 
 export default defineConfig({
+  content: {
+    filesystem: ["src/**/*.{ts,tsx,js,jsx,html}"],
+  },
   presets: [
     presetWind3(),
     presetIcons({
@@ -88,6 +91,13 @@ export default defineConfig({
       danger: "var(--danger)",
     },
   },
-  safelist: Object.keys(shortcuts),
+  safelist: [
+    ...Object.keys(shortcuts),
+    "i-feather-search",
+    "i-feather-x",
+    "i-feather-upload",
+    "i-feather-chevron-left",
+    "i-feather-more-vertical",
+  ],
   shortcuts,
 });

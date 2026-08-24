@@ -1,13 +1,19 @@
+import { A, createAsync, query, revalidate } from "@solidjs/router";
 import {
   createEffect,
   createMemo,
-  createResource,
   createSignal,
   For,
   Show,
 } from "solid-js";
 import { apiFetch } from "../lib/fetch";
 import type { Video } from "../lib/videos";
+
+const videosQuery = query(async () => {
+  const res = await apiFetch("/api/videos");
+  const data = (await res.json()) as { videos: Video[] };
+  return data.videos;
+}, "videos");
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -42,11 +48,8 @@ function Skeleton() {
 }
 
 export default function VideoGrid() {
-  const [videos, { refetch }] = createResource(async () => {
-    const res = await apiFetch("/api/videos");
-    const data = (await res.json()) as { videos: Video[] };
-    return data.videos;
-  });
+  const videos = createAsync(() => videosQuery());
+  const refetch = () => revalidate(videosQuery.keyFor());
 
   const initialQuery =
     new URLSearchParams(window.location.search).get("q") ?? "";
@@ -236,7 +239,7 @@ export default function VideoGrid() {
                       )}
                     </Show>
                   </div>
-                  <a
+                  <A
                     href={`/watch/${video.id}`}
                     class="video-card-link-overlay"
                   >
@@ -244,7 +247,7 @@ export default function VideoGrid() {
                     <span class="video-card-size">
                       {formatSize(video.size)}
                     </span>
-                  </a>
+                  </A>
                 </div>
               );
             }}

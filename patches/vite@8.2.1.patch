@@ -1,0 +1,13 @@
+diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
+index 6aae7eea37a45fd8ddde7b86a4a59dac09c0ee46..54daf3b222dfc1a2ca6409a8f0672a27ac49042b 100644
+--- a/dist/node/chunks/node.js
++++ b/dist/node/chunks/node.js
+@@ -20559,7 +20559,7 @@ async function loadAndTransform(environment, id, url, options, timestamp, mod, r
+ 	const { config, pluginContainer, logger } = environment;
+ 	const prettyUrl = debugLoad || debugTransform ? prettifyUrl(url, config.root) : "";
+ 	const moduleGraph = environment.moduleGraph;
+-	if (!options.skipFsCheck && id[0] !== "\0" && isServerAccessDeniedForTransform(config, id)) {
++	if (!options.skipFsCheck && id[0] !== "\0" && !/^\/(__uno\.css|@unocss\/)/.test(id) && isServerAccessDeniedForTransform(config, id)) {
+ 		const err = /* @__PURE__ */ new Error(`Denied ID ${id}`);
+ 		err.code = ERR_DENIED_ID;
+ 		err.id = id;

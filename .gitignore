@@ -2,7 +2,10 @@ node_modules/
 dist/
 dist-worker/
 .astro/
+.output/
+.vinxi/
 .wrangler/
+.claude/settings.local.json
 .direnv/
 .env
 .dev.vars

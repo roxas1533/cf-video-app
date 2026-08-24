@@ -1,4 +1,3 @@
-import Plyr from "plyr";
 import "plyr/dist/plyr.css";
 import { onCleanup, onMount } from "solid-js";
 import { apiFetch } from "../lib/fetch";
@@ -21,7 +20,7 @@ export default function VideoPlayer(props: Props) {
   let refreshing = false;
 
   let videoEl!: HTMLVideoElement;
-  let player: Plyr | undefined;
+  let player: { destroy(): void } | undefined;
 
   async function refreshUrl() {
     if (refreshing) return;
@@ -109,8 +108,15 @@ export default function VideoPlayer(props: Props) {
     });
   }
 
-  onMount(() => {
-    player = new Plyr(videoEl, {
+  onMount(async () => {
+    const mod = (await import("plyr")) as unknown as {
+      default: new (
+        el: HTMLElement,
+        opts: Record<string, unknown>,
+      ) => { destroy(): void };
+    };
+    const PlyrCtor = mod.default;
+    player = new PlyrCtor(videoEl, {
       controls: [
         "play-large",
         "play",
@@ -133,7 +139,7 @@ export default function VideoPlayer(props: Props) {
   });
 
   onCleanup(() => {
-    videoEl.removeEventListener("error", handleError);
+    videoEl?.removeEventListener("error", handleError);
     player?.destroy();
   });
 
