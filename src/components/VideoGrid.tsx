@@ -1,8 +1,8 @@
 import { A, createAsync, revalidate, useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { apiFetch } from "../lib/fetch";
-import { videosQuery } from "../lib/videosQuery";
 import type { Video } from "../lib/videos";
+import { videosQuery } from "../lib/videosQuery";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);

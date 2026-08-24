@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { query } from "@solidjs/router";
-import { getVideoList } from "./videos";
 import type { Video } from "./videos";
+import { getVideoList } from "./videos";
 
 export const videosQuery = query(async (): Promise<Video[]> => {
   "use server";

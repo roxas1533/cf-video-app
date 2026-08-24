@@ -10,6 +10,12 @@
       "*.mjs"
     ]
   },
+  "overrides": [
+    {
+      "includes": ["worker-configuration.d.ts"],
+      "linter": { "enabled": false }
+    }
+  ],
   "formatter": {
     "indentStyle": "space"
   },
