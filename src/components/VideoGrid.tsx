@@ -4,6 +4,8 @@ import { apiFetch } from "../lib/fetch";
 import type { Video } from "../lib/videos";
 import { videosQuery } from "../lib/videosQuery";
 
+let _staleVideos: Video[] | undefined;
+
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
@@ -39,6 +41,15 @@ function Skeleton() {
 export default function VideoGrid() {
   const videos = createAsync(() => videosQuery());
   const refetch = () => revalidate(videosQuery.keyFor());
+  // .latest returns the last resolved value without throwing (no Suspense),
+  // enabling stale-while-revalidate on back navigation.
+  const list = () =>
+    (videos as unknown as { latest: Video[] | undefined }).latest ??
+    _staleVideos;
+  createEffect(() => {
+    const v = videos();
+    if (v !== undefined) _staleVideos = v;
+  });
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = createSignal<string>(
@@ -49,9 +60,9 @@ export default function VideoGrid() {
   const [searchFocused, setSearchFocused] = createSignal(false);
   const filteredVideos = createMemo(() => {
     const q = query().trim().toLowerCase();
-    const list = videos() ?? [];
-    if (!q) return list;
-    return list.filter((v) => v.name.toLowerCase().includes(q));
+    const items = list() ?? [];
+    if (!q) return items;
+    return items.filter((v) => v.name.toLowerCase().includes(q));
   });
   let searchInputRef: HTMLInputElement | undefined;
 
@@ -170,7 +181,7 @@ export default function VideoGrid() {
 
   return (
     <>
-      <Show when={videos()} fallback={<Skeleton />}>
+      <Show when={list() !== undefined} fallback={<Skeleton />}>
         <div class="video-grid">
           <For each={filteredVideos()}>
             {(video, index) => {

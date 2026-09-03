@@ -1,11 +1,6 @@
 import { Title } from "@solidjs/meta";
 import { A } from "@solidjs/router";
 import VideoGrid from "~/components/VideoGrid";
-import { videosQuery } from "~/lib/videosQuery";
-
-export const route = {
-  preload: () => videosQuery(),
-};
 
 export default function Home() {
   return (

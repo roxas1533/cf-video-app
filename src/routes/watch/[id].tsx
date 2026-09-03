@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { Title } from "@solidjs/meta";
-import { A, createAsync, query, redirect, useParams } from "@solidjs/router";
+import { createAsync, query, redirect, useParams } from "@solidjs/router";
 import { Show, Suspense } from "solid-js";
 import VideoPlayer from "~/components/VideoPlayer";
 import { signVideoUrl } from "~/lib/r2Sign";
@@ -35,9 +35,13 @@ export default function Watch() {
             <Title>{v().name}</Title>
             <div class="container">
               <div class="header">
-                <A href="/" class="btn-icon-circle">
+                <button
+                  type="button"
+                  class="btn-icon-circle"
+                  onClick={() => history.back()}
+                >
                   <span class="i-feather-chevron-left text-lg" />
-                </A>
+                </button>
                 <h1 class="text-2xl font-semibold">{v().name}</h1>
               </div>
               <VideoPlayer

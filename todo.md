@@ -6,7 +6,8 @@
 
 - **影響範囲**: 開発サーバー (localhost)
 - **原因**: UnoCSSのVite統合が`\0`prefix仮想モジュール慣習に従わず、`/__uno.css`という実ファイルパスに見えるIDを返す。Vite 8のサーバーモジュールランナーがこれを実ファイルへのアクセスと判断して拒否する
-- **追跡**: [unocss/unocss#5271](https://github.com/unocss/unocss/issues/5271)
+- **追跡**: [unocss/unocss#5271](https://github.com/unocss/unocss/issues/5271) (2026-08-28 CLOSED/COMPLETED)
+- **修正PR**: [unocss/unocss#5284](https://github.com/unocss/unocss/pull/5284) (2026-08-28 merge済み・未リリース。`v66.8.1`以降のバージョンで含まれる予定)
 - **参考**: [solidjs/solid-start#2293](https://github.com/solidjs/solid-start/pull/2293) (根本解決できていないとしてclose済み)
 - **回避策**: `patches/vite@8.2.1.patch` (後述)
 
@@ -43,7 +44,7 @@
 - **対応バグ**: バグ①
 - **内容**: `vite/dist/node/chunks/node.js`の`isServerAccessDeniedForTransform`チェックから`/__uno.css`と`/@unocss/`プレフィックスを除外
 - **管理**: `bun patch`で管理済み。`bun install`後も自動適用される
-- **削除条件**: UnoCSSが`\0`prefix仮想モジュール慣習に対応したら不要
+- **削除条件**: PR#5284を含むUnoCSSバージョン(`v66.8.1`より新しいリリース)にアップデートしたら不要
 
 ### `build.outDir: ".output/public"` in `vite.config.ts`
 
