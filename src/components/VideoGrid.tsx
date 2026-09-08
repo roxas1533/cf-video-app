@@ -1,10 +1,24 @@
 import { A, createAsync, revalidate, useSearchParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  onMount,
+  Show,
+} from "solid-js";
 import { apiFetch } from "../lib/fetch";
 import type { Video } from "../lib/videos";
 import { videosQuery } from "../lib/videosQuery";
 
-let _staleVideos: Video[] | undefined;
+// Persists across SPA navigations; seeded from sessionStorage to survive
+// Chrome iOS full-reload on back navigation.
+const STALE_KEY = "videoList";
+let _stale: Video[] | undefined;
+try {
+  const s = sessionStorage.getItem(STALE_KEY);
+  if (s) _stale = JSON.parse(s) as Video[];
+} catch {}
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -41,14 +55,34 @@ function Skeleton() {
 export default function VideoGrid() {
   const videos = createAsync(() => videosQuery());
   const refetch = () => revalidate(videosQuery.keyFor());
-  // .latest returns the last resolved value without throwing (no Suspense),
-  // enabling stale-while-revalidate on back navigation.
+
+  // .latest avoids throwing a Promise (no Suspense), enabling stale-while-revalidate.
   const list = () =>
-    (videos as unknown as { latest: Video[] | undefined }).latest ??
-    _staleVideos;
+    (videos as unknown as { latest: Video[] | undefined }).latest ?? _stale;
+
   createEffect(() => {
     const v = videos();
-    if (v !== undefined) _staleVideos = v;
+    if (v !== undefined) {
+      _stale = v;
+      try {
+        sessionStorage.setItem(STALE_KEY, JSON.stringify(v));
+      } catch {}
+    }
+  });
+
+  // Solid Router's restore() runs after isRouting→false, which can be after
+  // the first paint. Pre-applying the saved position in onMount eliminates
+  // the one-frame flicker when stale data is available.
+  onMount(() => {
+    if (_stale === undefined) return;
+    try {
+      const saved: Record<string, number> = JSON.parse(
+        sessionStorage.getItem("solid-router:scroll") ?? "{}",
+      );
+      const depth = (history.state as { _depth?: number } | null)?._depth;
+      const y = depth != null ? saved[depth] : undefined;
+      if (y != null && y > 50) window.scrollTo(0, y);
+    } catch {}
   });
 
   const [searchParams, setSearchParams] = useSearchParams();
